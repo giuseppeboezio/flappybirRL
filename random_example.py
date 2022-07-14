@@ -1,7 +1,8 @@
 import time
 import flappy_bird_gym
+import utils
 
-env = flappy_bird_gym.make("FlappyBird-v0")
+env = flappy_bird_gym.make(utils.FLAPPY_BIRD_ENV)
 
 obs = env.reset()
 while True:
