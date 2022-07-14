@@ -5,10 +5,8 @@ class BaseAgent:
 
     def act(self, observation):
         """
-        perform an action given an observation of the environment
-        Parameters:
-            - observation: environment observation
-        Returns:
-            - action to perform
+        Perform an action given an observation of the environment
+        :param observation: environment observation
+        :return: action to perform
         """
         pass
