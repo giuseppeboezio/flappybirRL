@@ -39,5 +39,5 @@ if __name__ == "__main__":
     env = flappy_bird_gym.make(FLAPPY_BIRD_ENV)
     obs = env.reset()
     print(preprocess_obs(obs))
-    data = im.fromarray(obs)
-    data.save('observatiion.png')
+    # data = im.fromarray(obs)
+    # data.save('observatiion.png')

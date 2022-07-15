@@ -6,9 +6,9 @@ import flappy_bird_gym
 
 
 class RandomAgent(BaseAgent):
-    def __init__(self, act_space):
+    def __init__(self, num_actions):
         super().__init__()
-        self.num_actions = act_space.n
+        self.num_actions = num_actions
 
     def act(self, observation):
         action = np.random.randint(self.num_actions)
@@ -18,7 +18,7 @@ class RandomAgent(BaseAgent):
 if __name__ == "__main__":
 
     env = flappy_bird_gym.make(utils.FLAPPY_BIRD_ENV)
-    agent = RandomAgent(env.action_space)
+    agent = RandomAgent(env.action_space.n)
 
     obs = env.reset()
     while True:

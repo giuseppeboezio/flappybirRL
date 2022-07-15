@@ -4,19 +4,15 @@ import flappy_bird_gym
 import utils
 
 
-def get_a2c_network(obs_space, action_space):
+def get_a2c_network(obs_shape, num_actions):
     """
-    generate the actor-critic network
-    Parameters:
-        - obs_space: gym observation space of the environment
-        - action_space: gym action space of the environment
-    Returns:
-        - actor network and critic network
+    Generate the actor-critic network
+    :param obs_shape: shape of gym observation space
+    :param num_actions: number of actions in gym action space of the environment
+    :return actor network and critic network
     """
-    input_shape = obs_space.shape
-    output_shape = action_space.n
 
-    input = layers.Input(shape=input_shape)
+    input = layers.Input(shape=obs_shape)
     x = layers.Conv2D(16, (3, 3), activation='relu')(input)
     x = layers.MaxPool2D((2, 2))(x)
     x = layers.Conv2D(32, (3, 3), activation='relu')(x)
@@ -26,7 +22,7 @@ def get_a2c_network(obs_space, action_space):
     x = layers.Flatten()(x)
     x = layers.Dense(64, activation='relu')(x)
     x = layers.Dense(32, activation='relu')(x)
-    actions = layers.Dense(output_shape, activation='softmax')(x)
+    actions = layers.Dense(num_actions, activation='softmax')(x)
     value = layers.Dense(1, activation='relu')(x)
     # actor-critic network
     actor = keras.Model(input, actions, name="actor")
@@ -38,10 +34,9 @@ def get_a2c_network(obs_space, action_space):
 if __name__ == "__main__":
 
     env = flappy_bird_gym.make(utils.FLAPPY_BIRD_ENV)
-    obs_space = env.observation_space
-    act_space = env.action_space
+    obs_shape, num_actions = utils.extract_spaces(env, decompose=True)
 
-    actor, critic = get_a2c_network(obs_space, act_space)
+    actor, critic = get_a2c_network(obs_shape, num_actions)
 
     actor.summary()
     critic.summary()

@@ -186,7 +186,7 @@ def train_a2c_single_agent(agent, env, gamma, max_steps, queue_actor, queue_crit
 
 def train_a2c_agent(
         agent_class,
-        env_class,
+        env,
         obs_space,
         act_space,
         optimizer,
@@ -198,7 +198,7 @@ def train_a2c_agent(
     """
     Train an agent using the A2C algorithm
     :param agent_class: agent class
-    :param env_class: name of the gym environment
+    :param env: gym environment instance
     :param obs_space: observation space
     :param act_space: action space
     :param gamma: discount rate
@@ -208,6 +208,7 @@ def train_a2c_agent(
     :param num_threads: number of threads which interact with the environment
     :return: history of training
     """
+    env_class = env.__class__
     agent = agent_class(obs_space, act_space)
     policy = agent.actor
     value_net = agent.critic
