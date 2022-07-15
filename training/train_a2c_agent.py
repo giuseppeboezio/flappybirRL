@@ -2,6 +2,7 @@ from threading import Thread
 from queue import Queue
 import numpy as np
 import utils
+from utils import initialize_acc, mean_tensors
 import tensorflow as tf
 import flappy_bird_gym
 from tensorflow.keras.optimizers import RMSprop
@@ -87,18 +88,6 @@ def compute_gradients_critic(critic, obs, cumulative):
     grads = tape.gradient(loss, weights)
 
     return grads
-
-
-def initialize_acc(weights):
-    """
-    Initialize all weights of the net to 0
-    :param weights: weights of a network
-    :return: gradient 0
-    """
-    acc = []
-    for weight in weights:
-        acc.append(tf.zeros(weight.shape))
-    return acc
 
 
 def train_a2c_single_agent(agent, env, gamma, max_steps, queue_actor, queue_critic, queue_history):
@@ -187,8 +176,6 @@ def train_a2c_single_agent(agent, env, gamma, max_steps, queue_actor, queue_crit
 def train_a2c_agent(
         agent_class,
         env,
-        obs_space,
-        act_space,
         optimizer,
         max_steps=100,
         num_episodes=3000,
@@ -199,8 +186,6 @@ def train_a2c_agent(
     Train an agent using the A2C algorithm
     :param agent_class: agent class
     :param env: gym environment instance
-    :param obs_space: observation space
-    :param act_space: action space
     :param gamma: discount rate
     :param optimizer: optimization algorithm to update the weights
     :param max_steps: maximum number of timesteps per episode
@@ -208,8 +193,11 @@ def train_a2c_agent(
     :param num_threads: number of threads which interact with the environment
     :return: history of training
     """
+    # Environment settings
     env_class = env.__class__
-    agent = agent_class(obs_space, act_space)
+    obs_shape, num_actions = utils.extract_spaces(env, decompose=True)
+    # Agent settings
+    agent = agent_class(obs_shape, num_actions)
     policy = agent.actor
     value_net = agent.critic
     # average cumulative reward for each episode
@@ -219,13 +207,10 @@ def train_a2c_agent(
 
         print(f"Episode {episode + 1}")
 
-        # enable connection
-        # subprocess.Popen([r"..\start_deepracer.bat"])
-        # time.sleep(utils.WAIT_START)
-
         # queue used to store the gradients of each process
         queue_actor = Queue()
         queue_critic = Queue()
+        # queue to store the cumulative reward of each thread
         queue_history = Queue()
 
         threads = []
@@ -272,11 +257,12 @@ def train_a2c_agent(
         actor_weights = policy.trainable_variables
         critic_weights = value_net.trainable_variables
 
-        for grad in grads_actor:
-            optimizer.apply_gradients(zip(grad, actor_weights))
+        # the update is done using the average gradients of threads
+        average_grad_actor = mean_tensors(grads_actor)
+        average_grad_critic = mean_tensors(grads_critic)
 
-        for grad in grads_critic:
-            optimizer.apply_gradients(zip(grad, critic_weights))
+        optimizer.apply_gradients(zip(average_grad_actor, actor_weights))
+        optimizer.apply_gradients(zip(average_grad_critic, critic_weights))
 
         # save the model
         agent.save_model("saved_models/a2c")
@@ -290,13 +276,10 @@ def train_a2c_agent(
 if __name__ == "__main__":
 
     env = flappy_bird_gym.make(utils.FLAPPY_BIRD_ENV)
-    obs_space, act_space = utils.extract_spaces(env, decompose=True)
 
     history = train_a2c_agent(
         ActorCriticAgent,
         env,
-        obs_space,
-        act_space,
         RMSprop()
     )
     manager = utils.SeriesManager(["A2C"])
