@@ -288,7 +288,7 @@ if __name__ == "__main__":
         "A2C Training",
         "Episode",
         "Average cumulative reward",
-        path=r"training_history/plot/A2C_single_two.png",
+        path=r"plot/A2C.png",
         save=True
     )
-    manager.save_series("A2C", r"training_history/data/A2C_single_two.csv")
+    manager.save_series("A2C", r"data/A2C.csv")
