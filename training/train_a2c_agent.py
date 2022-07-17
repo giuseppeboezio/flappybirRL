@@ -2,7 +2,7 @@ from threading import Thread
 from queue import Queue
 import numpy as np
 import utils
-from utils import initialize_acc, mean_tensors
+from utils import initialize_acc, mean_tensors, run_episode
 import tensorflow as tf
 import flappy_bird_gym
 from tensorflow.keras.optimizers import RMSprop
@@ -105,35 +105,12 @@ def train_a2c_single_agent(agent, env, gamma, max_steps, queue_actor, queue_crit
     # networks information
     single_policy = agent.actor
     single_val_net = agent.critic
-    num_actions = agent.action_space
+    num_actions = agent.num_actions
 
     num_weights_actor = len(single_policy.trainable_variables)
     num_weights_val_net = len(single_val_net.trainable_variables)
 
-    history_obs = []
-    history_actions = []
-    history_rewards = []
-    done = False
-
-    obs = env.reset()
-    obs = utils.preprocess_obs(obs)
-    history_obs.append(obs)
-
-    step = 0
-    # interaction with the environment
-    while step < max_steps and not done:
-
-        # the agent chooses the action
-        action = agent.act(obs)
-        # the agent performs the action
-        obs, reward, done, info = env.step(action)
-        # store history
-        history_actions.append(action)
-        history_rewards.append(reward)
-        # load new observation
-        obs = utils.preprocess_obs(obs)
-        history_obs.append(obs)
-        step += 1
+    history_obs, history_actions, history_rewards, done = run_episode(env, agent, max_steps)
 
     # compute the gradients for each timestep
 
@@ -177,7 +154,7 @@ def train_a2c_agent(
         agent_class,
         env,
         optimizer,
-        max_steps=100,
+        max_steps=100000,
         num_episodes=3000,
         gamma=0.90,
         num_threads=1
@@ -236,9 +213,6 @@ def train_a2c_agent(
         # terminate the threads
         for thread in threads:
             thread.join()
-
-        # disable the connection
-        # subprocess.call([r"..\stop_deepracer.bat"])
 
         # get the gradients of each thread
         grads_actor = []

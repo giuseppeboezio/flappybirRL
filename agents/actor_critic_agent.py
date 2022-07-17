@@ -1,7 +1,7 @@
-from base_agent import BaseAgent
+from .base_agent import BaseAgent
 import numpy as np
 from keras.models import save_model, load_model
-from networks import get_a2c_network
+from .networks import get_a2c_network
 import time
 import flappy_bird_gym
 import utils

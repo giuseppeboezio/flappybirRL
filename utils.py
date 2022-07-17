@@ -28,6 +28,7 @@ def preprocess_obs(observation):
     """
     new_obs = observation.astype('float64')
     new_obs /= 255
+    # trick to add the batch dimension
     shape = list(new_obs.shape)
     shape = [1] + shape
     new_obs = new_obs.reshape(tuple(shape))
@@ -60,6 +61,44 @@ def mean_tensors(tensors):
             acc[i] = tf.add(acc[i], tensors[j][i])
         acc[i] = tf.divide(acc[i], tf.constant(num_elem, dtype='float32'))
     return acc
+
+
+def run_episode(env, agent, max_steps):
+    """
+    Run an episode where an agent interacts with the environment for at most max_steps
+    @param env: environment
+    @param agent: agent which interacts with the environment
+    @param max_steps: maximum number of interactions
+    @return history_obs: observations in the trajectory
+    @return history_actions: actions in the trajectory
+    @return history_rewards: rewards of the trajectory
+    @return done: whether the interactions is terminated because the last state is a terminal one or not
+    """
+    history_obs = []
+    history_actions = []
+    history_rewards = []
+    done = False
+
+    obs = env.reset()
+    obs = preprocess_obs(obs)
+    history_obs.append(obs)
+
+    step = 0
+    # interaction with the environment
+    while step < max_steps and not done:
+        # the agent chooses the action
+        action = agent.act(obs)
+        # the agent performs the action
+        obs, reward, done, info = env.step(action)
+        # store history
+        history_actions.append(action)
+        history_rewards.append(reward)
+        # load new observation
+        obs = preprocess_obs(obs)
+        history_obs.append(obs)
+        step += 1
+
+    return history_obs, history_actions, history_rewards, done
 
 
 class SeriesManager:
