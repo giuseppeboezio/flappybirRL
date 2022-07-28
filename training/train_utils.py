@@ -28,8 +28,3 @@ def mean_tensors(tensors):
         acc[i] = tf.divide(acc[i], tf.constant(num_elem, dtype='float32'))
     return acc
 
-def update_series(series, obs):
-  new_series = series.numpy()
-  new_series[:, :-1, :] = new_series[:, 1:, :]
-  new_series[:, -1, :] = obs
-  return tf.constant(new_series)
