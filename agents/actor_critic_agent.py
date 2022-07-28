@@ -1,7 +1,7 @@
-from .base_agent import BaseAgent
+from queue import Queue
+from threading import Thread
 import numpy as np
-from keras.models import save_model, load_model
-from .networks import get_a2c_network
+from .base_agent import BaseAgent
 import time
 import flappy_bird_gym
 import utils
@@ -9,16 +9,16 @@ import utils
 
 class ActorCriticAgent(BaseAgent):
 
-    def __init__(self, obs_shape, num_actions):
+    def __init__(self, network_class, num_actions):
         """
         Creation of the agent
-        :param obs_shape: shape of the input
-        :param num_actions: number of different actions
+        :param network_class: neural network class used by the agent
+        :param num_actions: number of actions to interact with the environment
         """
         super().__init__()
-        self.obs_shape = obs_shape
+        self.net_class = network_class
         self.num_actions = num_actions
-        self.actor, self.critic = get_a2c_network(self.obs_shape, self.num_actions)
+        self.network = network_class(num_actions)
 
     def act(self, observation):
         """
@@ -26,37 +26,30 @@ class ActorCriticAgent(BaseAgent):
         :param observation: observable part of the environment
         :return: action to perform
         """
-        predictions = self.actor.predict(observation)
-        action = np.random.choice(self.num_actions, p=predictions.flatten())
-        return action
+        return self.network(observation)
 
-    def save_model(self, path):
+    def save_weights(self, path):
         """
         Save the policy model
-        :param path: path of the model
+        :param path: path of the model's weights
         :return: save the model
         """
-        save_model(self.actor,f"{path}_actor")
-        save_model(self.critic, f"{path}_critic")
+        self.network.save_weights(path)
 
-    def load_model(self, path):
+    def load_weights(self, path):
         """
         Load the policy from a stored model
-        :param folder: folder where the model is contained
-        :param name: name of the model
-        :return: load the model
+        :param path: path of the model's weights
         """
-        self.actor = load_model(f"{path}_actor")
-        self.critic = load_model(f"{path}_critic")
+        self.network.load_weights(path)
 
     def copy(self):
         """
         Copy of the agent
         :return: copy of the agent with the same weights of the current one
         """
-        new_agent = ActorCriticAgent(self.obs_shape, self.num_actions)
-        new_agent.actor.set_weights(self.actor.get_weights())
-        new_agent.critic.set_weights(self.critic.get_weights())
+        new_agent = ActorCriticAgent(self.net_class, self.num_actions)
+        new_agent.network.set_weights(self.network.get_weights())
         return new_agent
 
 
