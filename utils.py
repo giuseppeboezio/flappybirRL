@@ -1,6 +1,11 @@
-import tensorflow as tf
 from matplotlib import pyplot as plt
 import pandas as pd
+
+# constants
+# input shape base model
+BASE_SHAPE = (1, 5, 3)
+# dot size scatter plot
+DOT_SIZE = 7
 
 
 class SeriesManager:
@@ -57,7 +62,7 @@ class SeriesManager:
         target = pd_series.to_numpy().flatten()
         self.add_series(series_name, target)
 
-    def plot_graph(self, title, x_label, y_label, grid=True, path=None, save=False):
+    def plot_comparison_graph(self, title, x_label, y_label, grid=True, path=None, save=False):
         """
         Plot comparison among temporal series
         :param title: title of the plot
@@ -76,6 +81,17 @@ class SeriesManager:
             plt.plot(self.data[key], label=key)
         plt.legend(loc='upper right')
         # saving the image
+        if save:
+            plt.savefig(path)
+        plt.show()
+
+    def plot_scatter(self, series_name, title, x_label, y_label, size, path=None, save=False):
+        series = self.data[series_name]
+        plt.grid(True)
+        plt.title(title)
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+        plt.scatter(range(len(series)), series, s=size)
         if save:
             plt.savefig(path)
         plt.show()

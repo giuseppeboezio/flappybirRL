@@ -15,7 +15,7 @@ class ActorCriticBase(tf.keras.Model):
         self.dense2 = layers.Dense(4, activation='relu')
         self.dense3 = layers.Dense(2, activation='relu')
         self.actor = layers.Dense(num_actions, activation='softmax')
-        self.critic = layers.Dense(1)
+        self.critic = layers.Dense(1, activation='relu')
 
     def call(self, inputs: tf.Tensor):
         x = self.gru1(inputs)
@@ -48,3 +48,10 @@ class ActorCriticCNN(tf.keras.Model):
         x = self.flatten1(x)
         x = self.dense1(x)
         return self.actor(x), self.critic(x)
+
+
+if __name__ == "__main__":
+
+    model = ActorCriticBase(2)
+    model.build((1,5,3))
+    model.summary()

@@ -5,6 +5,7 @@ from agents.actor_critic_agent import ActorCriticAgent
 import flappy_bird_gym
 from tensorflow.keras.optimizers import RMSprop
 from train_a2c import train_step
+from utils import SeriesManager, DOT_SIZE, BASE_SHAPE
 
 
 def update_series(series, obs):
@@ -34,11 +35,11 @@ def episode(agent, env, max_steps):
         # agent's behaviour
         action_probs_step, value = agent.act(state_series)
         # action choice
-        action = np.random.choice(range(1), p=action_probs_step.flatten())
+        action = np.random.choice(range(agent.num_actions), p=action_probs_step.numpy().flatten())
         # storing value and action
-        values.append(value)
+        values.append(value[0,0])
         action_probs.append(action_probs_step[0, action])
-        state, reward, done = env.step(action)
+        state, reward, done, _ = env.step(action)
         state_series = update_series(state_series, state)
         # storing reward
         rewards.append(reward)
@@ -57,15 +58,15 @@ def episode(agent, env, max_steps):
 if __name__ == "__main__":
 
     # Initialization
-    num_episodes = 3
+    num_episodes = 1000
     num_threads = 1
     env = flappy_bird_gym.make("FlappyBird-v0")
     num_actions = env.action_space.n
-    agent = ActorCriticAgent(ActorCriticBase, num_actions)
+    agent = ActorCriticAgent(ActorCriticBase, BASE_SHAPE, num_actions)
     max_steps = 100000
     gamma = 0.99
     optimizer = RMSprop()
-    path = "saved_models/base"
+    path = "saved_models/base/base"
 
     history_rewards = []
 
@@ -86,7 +87,15 @@ if __name__ == "__main__":
 
         history_rewards.append(episode_reward)
 
-    print("Cycle works correctly")
-
-
-
+    manager = SeriesManager(["base_model"])
+    manager.add_series("base_model", history_rewards)
+    manager.save_series("base_model", "plot/base_model.csv")
+    manager.plot_scatter(
+        "base_model",
+        "Base Model",
+        "Episode",
+        "Average Reward",
+        DOT_SIZE,
+        "plot/base.png",
+        save=True
+    )

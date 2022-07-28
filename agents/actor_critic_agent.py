@@ -1,6 +1,3 @@
-from queue import Queue
-from threading import Thread
-import numpy as np
 from .base_agent import BaseAgent
 import time
 import flappy_bird_gym
@@ -9,7 +6,7 @@ import utils
 
 class ActorCriticAgent(BaseAgent):
 
-    def __init__(self, network_class, num_actions):
+    def __init__(self, network_class, input_shape, num_actions):
         """
         Creation of the agent
         :param network_class: neural network class used by the agent
@@ -18,7 +15,9 @@ class ActorCriticAgent(BaseAgent):
         super().__init__()
         self.net_class = network_class
         self.num_actions = num_actions
+        self.input_shape = input_shape
         self.network = network_class(num_actions)
+        self.network.build(input_shape)
 
     def act(self, observation):
         """
@@ -48,7 +47,7 @@ class ActorCriticAgent(BaseAgent):
         Copy of the agent
         :return: copy of the agent with the same weights of the current one
         """
-        new_agent = ActorCriticAgent(self.net_class, self.num_actions)
+        new_agent = ActorCriticAgent(self.net_class, self.input_shape, self.num_actions)
         new_agent.network.set_weights(self.network.get_weights())
         return new_agent
 

@@ -11,7 +11,7 @@ def get_discounted_rewards(rewards, gamma):
     eps = np.finfo(np.float32).eps.item()
     # number of rewards excluded the last one
     t = len(rewards) - 1
-    discounted_rewards = np.zeros(len(rewards))
+    discounted_rewards = np.zeros(len(rewards), dtype='float32')
     discounted_rewards[-1] = rewards[-1]
     for i in range(t-1, -1, -1):
         discounted_rewards[i] = rewards[i] + gamma * discounted_rewards[i + 1]
@@ -27,7 +27,7 @@ def compute_loss(values, discounted_rewards, action_probs):
     advantages = tf.constant(discounted_rewards - values)
     log_probs = tf.math.log(action_probs)
     actor_loss = - tf.math.reduce_sum(log_probs * advantages)
-    critic_loss = tf.math.reduce_sum(tf.math.pow(advantages, tf.constant(2)))
+    critic_loss = tf.math.reduce_sum(tf.math.pow(advantages, tf.constant(2.0)))
     loss = actor_loss + critic_loss
     return loss
 
