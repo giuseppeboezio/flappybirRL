@@ -8,25 +8,13 @@ import tensorflow as tf
 BASE_SHAPE = (1, 8, 2)
 
 
-def initialize_acc(weights):
-    """
-    Initialize all weights of the net to 0
-    :param weights: weights of a network
-    :return: gradient 0
-    """
-    acc = []
-    for weight in weights:
-        acc.append(tf.zeros(weight.shape))
-    return acc
-
-
 def mean_tensors(tensors):
     """
     Compute the mean of tensors contained in different lists
     :param tensors: nested list of tensors
     :return list of mean tensors
     """
-    acc = initialize_acc(tensors[0])
+    acc = [tf.zeros_like(x) for x in tensors[0]]
     num_tensors = len(tensors[0])
     num_elem = len(tensors)
     for i in range(num_tensors):
