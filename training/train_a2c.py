@@ -5,74 +5,72 @@ import numpy as np
 import tensorflow as tf
 
 
-def get_discounted_rewards(rewards, gamma):
-
-    # epsilon for stabilizing division
+def get_expected_returns(rewards, gamma):
+    """
+    Returns expected returns of an episode
+    :param rewards: rewards of an episode plus the value of the last state
+    :param gamma: discount rate to compute expected returns
+    :return expected returns
+    """
+    # epsilon for stabilizing division operation
     eps = np.finfo(np.float32).eps.item()
-    # number of rewards excluded the last one
+    # number of rewards excluded the last state value
     t = len(rewards) - 1
-    discounted_rewards = np.zeros(len(rewards), dtype='float32')
-    discounted_rewards[-1] = rewards[-1]
+    expected_returns = np.zeros(len(rewards), dtype='float32')
+    # the last position is used just to set the last state value as starting value
+    expected_returns[-1] = rewards[-1]
     for i in range(t-1, -1, -1):
-        discounted_rewards[i] = rewards[i] + gamma * discounted_rewards[i + 1]
-    # standardization
-    discounted_rewards = ((discounted_rewards - tf.math.reduce_mean(discounted_rewards)) /
-               (tf.math.reduce_std(discounted_rewards) + eps))
+        expected_returns[i] = rewards[i] + gamma * expected_returns[i + 1]
+    # standardization for a more stable outcome
+    # (expected_returns - mean(expected_returns)) / (std(expected_returns + eps)
+    # eps is added to avoid division by 0
+    expected_returns = ((expected_returns - tf.math.reduce_mean(expected_returns)) /
+               (tf.math.reduce_std(expected_returns) + eps))
     # last reward was just a way to store the value of the last state
-    return discounted_rewards[:-1]
+    return expected_returns[:-1]
 
 
-def compute_loss(values, discounted_rewards, action_probs):
-
-    advantages = tf.constant(discounted_rewards - values)
-    log_probs = tf.math.log(action_probs)
-    actor_loss = - tf.math.reduce_sum(log_probs * advantages)
-    critic_loss = tf.math.reduce_sum(tf.math.pow(advantages, tf.constant(2.0)))
-    loss = actor_loss + critic_loss
-    return loss
-
-
-def train_agent(
-        agent,
-        env,
-        run_episode,
-        gamma,
-        max_steps,
-        queue_gradients,
-        queue_history
-):
+def train_agent(agent, env, run_episode, max_steps, gamma, loss_estimator, queue_gradients, queue_history):
+    """
+    Compute the gradient of the loss wrt the network's weights for a specific thread
+    :param agent: player of the game
+    :param env: OpenAI Gym environment
+    :param run_episode: function to run a single episode,
+    its parameters are the agent, the environment and the maximum number of steps per episode
+    :param max_steps: upper limit of interactions with the environment in a single episode
+    :param gamma: discount rate to compute expected returns
+    :param loss_estimator: estimator of the loss function
+    :param queue_gradients: queue to store gradients of different threads
+    :param queue_history: queue to store cumulative rewards of different threads
+    """
     with tf.GradientTape() as tape:
 
         # run an episode
         values, action_probs, rewards = run_episode(agent, env, max_steps)
         # get the discounted rewards
-        discounted_rewards = get_discounted_rewards(rewards, gamma)
+        expected_returns = get_expected_returns(rewards, gamma)
         # compute loss
-        loss = compute_loss(values, discounted_rewards, action_probs)
+        loss = loss_estimator.compute_loss(values, expected_returns, action_probs)
 
     grads = tape.gradient(loss, agent.network.trainable_variables)
     queue_gradients.put(grads)
     queue_history.put(np.sum(rewards))
 
 
-def train_step(
-        num_threads,
-        agent,
-        env_class,
-        run_episode,
-        max_steps,
-        gamma,
-        optimizer
-):
+def train_step(num_threads, agent, env_class, run_episode, max_steps, gamma, loss_estimator, optimizer):
     """
     Train the agent for one episode averaging the gradients of each thread
     :param num_threads: number of different environment interaction in an episode
     :param agent: player of the game
     :param env_class: openAI Gym environment class
-    :param run_episode: function to run a single thread episode
+    :param run_episode: function to run a single thread episode,
+    its parameters are the agent, the environment and the maximum number of steps per episode
     :param max_steps: upper limit of interactions with the environment in a single episode
-    :param gamma: discount factor to compute expected returns
+    :param gamma: discount rate to compute expected returns
+    :param loss_estimator: estimator of the loss function
     :param optimizer: optimizer to update network's weights
+    :return mean of cumulative rewards
+    :return standard deviation of cumulative rewards
     """
     # queue used to store the gradients of each thread
     queue_gradients = Queue()
@@ -85,8 +83,9 @@ def train_step(
             agent.copy(),
             env_class(),
             run_episode,
-            gamma,
             max_steps,
+            gamma,
+            loss_estimator,
             queue_gradients,
             queue_rewards
         )

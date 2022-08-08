@@ -11,9 +11,9 @@ DOT_SIZE = 7
 
 def log2(x):
     """
-    Compute logarithm in base 2
+    Compute logarithm in base 2, this functionality is not supported in tensorflow
     :param x: argument of the logarithm
-    :return: log in base 2 of x
+    :return log in base 2 of x
     """
     numerator = tf.math.log(x)
     denominator = tf.math.log(tf.constant(10, dtype=numerator.dtype))
