@@ -1,11 +1,23 @@
 from matplotlib import pyplot as plt
 import pandas as pd
+import tensorflow as tf
 
 # constants
 # input shape base model
 BASE_SHAPE = (1, 5, 3)
 # dot size scatter plot
 DOT_SIZE = 7
+
+
+def log2(x):
+    """
+    Compute logarithm in base 2
+    :param x: argument of the logarithm
+    :return: log in base 2 of x
+    """
+    numerator = tf.math.log(x)
+    denominator = tf.math.log(tf.constant(10, dtype=numerator.dtype))
+    return numerator / denominator
 
 
 class SeriesManager:
