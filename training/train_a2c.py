@@ -62,10 +62,19 @@ def train_step(
         run_episode,
         max_steps,
         gamma,
-        optimizer,
-        path
+        optimizer
 ):
-    # queue used to store the gradients of each process
+    """
+    Train the agent for one episode averaging the gradients of each thread
+    :param num_threads: number of different environment interaction in an episode
+    :param agent: player of the game
+    :param env_class: openAI Gym environment class
+    :param run_episode: function to run a single thread episode
+    :param max_steps: upper limit of interactions with the environment in a single episode
+    :param gamma: discount factor to compute expected returns
+    :param optimizer: optimizer to update network's weights
+    """
+    # queue used to store the gradients of each thread
     queue_gradients = Queue()
     # queue to store the cumulative reward of each thread
     queue_rewards = Queue()
@@ -104,6 +113,4 @@ def train_step(
     average_grad = mean_tensors(grads)
     optimizer.apply_gradients(zip(average_grad, network_weights))
 
-    agent.save_weights(path)
-
-    return np.mean(cum_rewards)
+    return np.mean(cum_rewards), np.std(cum_rewards)
