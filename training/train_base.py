@@ -5,7 +5,8 @@ from agents.actor_critic_agent import ActorCriticAgent
 import flappy_bird_gym
 from tensorflow.keras.optimizers import RMSprop
 from train_a2c import train_step
-from utils import SeriesManager, DOT_SIZE, BASE_SHAPE
+from loss_estimator import A2CLossEstimator
+from utils import BASE_SHAPE, save_series, plot_graph
 
 
 def update_series(series, obs):
@@ -16,15 +17,21 @@ def update_series(series, obs):
 
 
 def episode(agent, env, max_steps):
+    """
+    Run an episode of the environment
+    :param agent: player of the game
+    :param env: environment
+    :param max_steps: maximum amount of steps to interact with the environment
+    """
 
     values = []
     action_probs = []
     rewards = []
 
     obs = tf.constant(env.reset())
-    SERIES_LENGTH = 5
-    # (1,3) because the state is (x_distance, y_distance, y_velocity)
-    initial_state_reshaped = tf.reshape(obs, (1, 3))
+    SERIES_LENGTH = 8
+    # (1,2) because the state is (x_distance, y_distance)
+    initial_state_reshaped = tf.reshape(obs, (1, 2))
     state_series = tf.repeat(initial_state_reshaped, SERIES_LENGTH, axis=0)
     state_series = tf.expand_dims(state_series, 0)
 
@@ -47,27 +54,27 @@ def episode(agent, env, max_steps):
         step += 1
 
     # check exit condition
-    if done:
-        value = 0
-    else:
+    value = 0
+    if not done:
+        # the reward of the last state is estimated with the state-value function
         action_probs_step, value = agent.act(state_series)
         value = value[0, 0]
 
     rewards.append(value)
-
     return values, action_probs, rewards
 
 
 if __name__ == "__main__":
 
     # Initialization
-    num_episodes = 1000
-    num_threads = 3
+    num_episodes = 3
+    num_threads = 1
     env = flappy_bird_gym.make("FlappyBird-v0")
     num_actions = env.action_space.n
     agent = ActorCriticAgent(ActorCriticBase, BASE_SHAPE, num_actions)
     max_steps = 100000
     gamma = 0.99
+    estimator = A2CLossEstimator()
     optimizer = RMSprop(decay=0.99)
     path = "saved_models/base/base"
 
@@ -83,8 +90,8 @@ if __name__ == "__main__":
             episode,
             max_steps,
             gamma,
-            optimizer,
-            path
+            estimator,
+            optimizer
         )
 
         agent.save_weights("saved_models/base/base")
@@ -94,4 +101,17 @@ if __name__ == "__main__":
         mean_rewards.append(mean)
         std_rewards.append(std)
 
-
+    # save the results
+    save_series(mean_rewards, "data/base/base_mean.csv")
+    save_series(std_rewards, "data/base/base_std.csv")
+    plot_graph(
+        [mean_rewards, std_rewards],
+        ["Mean", "Std"],
+        ["-b","-y"],
+        "",
+        "Training Episode",
+        "",
+        True,
+        True,
+        "plot/base.png"
+    )
