@@ -1,7 +1,4 @@
 from .base_agent import BaseAgent
-import time
-import flappy_bird_gym
-import utils
 
 
 class ActorCriticAgent(BaseAgent):
@@ -21,24 +18,23 @@ class ActorCriticAgent(BaseAgent):
 
     def act(self, observation):
         """
-        Corresponds to the selection of an action given a probability mass function
+        Corresponds to the probability distribution of actions given an observation and the value of the state
         :param observation: observable part of the environment
-        :return: action to perform
+        :return: actions probability distribution
         """
         return self.network(observation)
 
     def save_weights(self, path):
         """
-        Save the policy model
-        :param path: path of the model's weights
-        :return: save the model
+        Save the weights of the model
+        :param path: path to store the weights
         """
         self.network.save_weights(path)
 
     def load_weights(self, path):
         """
-        Load the policy from a stored model
-        :param path: path of the model's weights
+        Load the weights of the model
+        :param path: path where the model's weights are stored
         """
         self.network.load_weights(path)
 
@@ -50,33 +46,3 @@ class ActorCriticAgent(BaseAgent):
         new_agent = ActorCriticAgent(self.net_class, self.input_shape, self.num_actions)
         new_agent.network.set_weights(self.network.get_weights())
         return new_agent
-
-
-if __name__ == "__main__":
-
-    env = flappy_bird_gym.make(utils.FLAPPY_BIRD_ENV)
-    obs_shape, num_actions = utils.extract_spaces(env, decompose=True)
-    agent = ActorCriticAgent(obs_shape, num_actions)
-
-    obs = env.reset()
-    obs = utils.preprocess_obs(obs)
-
-    while True:
-
-        action = agent.act(obs)
-
-        # Processing:
-        obs, reward, done, info = env.step(action)
-        obs = utils.preprocess_obs(obs)
-
-        # Rendering the game:
-        # (remove this two lines during training)
-        env.render()
-        time.sleep(1 / 30)  # FPS
-
-        # Checking if the player is still alive
-        if done:
-            break
-
-    env.close()
-
