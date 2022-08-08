@@ -44,11 +44,14 @@ def episode(agent, env, max_steps):
         # storing reward
         rewards.append(reward)
 
+        step += 1
+
     # check exit condition
     if done:
         value = 0
     else:
         action_probs_step, value = agent.act(state_series)
+        value = value[0, 0]
 
     rewards.append(value)
 
@@ -59,20 +62,21 @@ if __name__ == "__main__":
 
     # Initialization
     num_episodes = 1000
-    num_threads = 1
+    num_threads = 3
     env = flappy_bird_gym.make("FlappyBird-v0")
     num_actions = env.action_space.n
     agent = ActorCriticAgent(ActorCriticBase, BASE_SHAPE, num_actions)
     max_steps = 100000
     gamma = 0.99
-    optimizer = RMSprop()
+    optimizer = RMSprop(decay=0.99)
     path = "saved_models/base/base"
 
-    history_rewards = []
+    mean_rewards = []
+    std_rewards = []
 
     for i in range(num_episodes):
 
-        episode_reward = train_step(
+        mean, std = train_step(
             num_threads,
             agent,
             env.__class__,
@@ -83,19 +87,11 @@ if __name__ == "__main__":
             path
         )
 
-        print(f"Episode {i+1}, Reward: {episode_reward}")
+        agent.save_weights("saved_models/base/base")
 
-        history_rewards.append(episode_reward)
+        print(f"Episode {i+1}, Mean: {mean} Std: {std}")
 
-    manager = SeriesManager(["base_model"])
-    manager.add_series("base_model", history_rewards)
-    manager.save_series("base_model", "plot/base_model.csv")
-    manager.plot_scatter(
-        "base_model",
-        "Base Model",
-        "Episode",
-        "Average Reward",
-        DOT_SIZE,
-        "plot/base.png",
-        save=True
-    )
+        mean_rewards.append(mean)
+        std_rewards.append(std)
+
+

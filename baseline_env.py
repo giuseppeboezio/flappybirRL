@@ -28,40 +28,44 @@ class ActorCriticBase(tf.keras.Model):
         x = self.dense3(x)
         return self.actor(x), self.critic(x)
 
+
 def update_series(series, obs):
-  new_series = series.numpy()
-  new_series[:, :-1, :] = new_series[:, 1:, :]
-  new_series[:, -1, :] = obs
-  return tf.constant(new_series)
+    new_series = series.numpy()
+    new_series[:, :-1, :] = new_series[:, 1:, :]
+    new_series[:, -1, :] = obs
+    return tf.constant(new_series)
 
 
 if __name__ == "__main__":
     env = flappy_bird_gym.make("FlappyBird-v0")
+    """
     num_actions = env.action_space.n
     model = ActorCriticBase(num_actions)
-    model.load_weights("baseline/baseline")
 
     initial_state = tf.constant(env.reset(), dtype=tf.float32)
+    print(initial_state)
     SERIES_LENGTH = 5
     initial_state_reshaped = tf.reshape(initial_state, (1, 3))
     state_series = tf.repeat(initial_state_reshaped, SERIES_LENGTH, axis=0)
     state_series = tf.expand_dims(state_series, 0)
+    """
+
+    env.reset()
 
     while True:
         # Next action:
 
-        action_probs_t, value = model(state_series)
-        action = tf.random.categorical(tf.math.log(action_probs_t), 1)[0, 0]
+        # action_probs_t, value = model(state_series)
+        # action = tf.random.categorical(tf.math.log(action_probs_t), 1)[0, 0]
 
         # Processing:
-        obs, reward, done, info = env.step(action)
-        print(reward)
-        state_series = update_series(state_series, obs)
+        obs, reward, done, info = env.step(1)
+        #state_series = update_series(state_series, obs)
 
         # Rendering the game:
         # (remove this two lines during training)
         env.render()
-        time.sleep(1 / 30)  # FPS
+        time.sleep(1 / 3)  # FPS
 
         # Checking if the player is still alive
         if done:

@@ -1,3 +1,4 @@
+import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 import tensorflow as tf
@@ -9,6 +10,22 @@ BASE_SHAPE = (1, 5, 3)
 DOT_SIZE = 7
 
 
+def mean_tensors(tensors):
+    """
+    Compute the mean of tensors contained in different lists
+    :param tensors: nested list of tensors
+    :return: list of mean tensors
+    """
+    acc = tf.zeros_like(tensors[0])
+    num_tensors = len(tensors[0])
+    num_elem = len(tensors)
+    for i in range(num_tensors):
+        for j in range(num_elem):
+            acc[i] = tf.add(acc[i], tensors[j][i])
+        acc[i] = tf.divide(acc[i], tf.constant(num_elem, dtype='float32'))
+    return acc
+
+
 def log2(x):
     """
     Compute logarithm in base 2, this functionality is not supported in tensorflow
@@ -16,94 +33,68 @@ def log2(x):
     :return log in base 2 of x
     """
     numerator = tf.math.log(x)
-    denominator = tf.math.log(tf.constant(10, dtype=numerator.dtype))
+    denominator = tf.math.log(tf.constant(2, dtype=numerator.dtype))
     return numerator / denominator
 
 
-class SeriesManager:
+def save_series(series, path):
+    """
+    Store a timeseries in a csv file
+    :param series: numpy array
+    :param path: location to store the series
+    """
+    pd_series = pd.Series(series)
+    pd_series.to_csv(path, header=False, index=False)
 
-    def __init__(self, series_names):
-        """
-        Create an object to store temporal series
-        :param series_names: names of temporal series
-        """
-        self.data = {}
-        for name in series_names:
-            self.data[name] = []
 
-    def add_empty_series(self, name):
-        """
-        Add an empty temporal series
-        :param name: name of the temporal series
-        """
-        self.data[name] = []
+def load_series(path):
+    """
+    Load a series from a specified location
+    :param path: location where the series is stored
+    :return numpy series
+    """
+    pd_series = pd.read_csv(path, header=False)
+    series = pd_series.to_numpy().flatten()
+    return series
 
-    def add_series(self, name, series):
-        """
-        Add a series to the store
-        :param name: name of the series
-        :param series: series list
-        """
-        self.data[name] = series
 
-    def add_data(self, series_name, data):
-        """
-        Add a data to a specified series
-        :param series_name: index of the series
-        :param data: data
-        """
-        self.data[series_name].append(data)
+def plot_graph(series_list, series_labels, markers, title, x_label, y_label, grid=True, save=False, path=None):
+    """
+    Compare different timeseries
+    :param series_list: list of numpy arrays
+    :param series_labels: labels of each series
+    :param markers: markers of each series
+    :param title: title of the plot
+    :param x_label: label of x-axis
+    :param y_label: label of y-axis
+    :param grid: flag to enable grid
+    :param save: flag to save the plot
+    :param path: location where to save the image
+    """
+    plt.grid(grid)
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    for (series, label, marker) in zip(series_list, series_labels, markers):
+        plt.plot(series, marker, label=label)
+    plt.legend(loc='upper left')
+    # saving the image
+    if save:
+        assert path is not None
+        plt.savefig(path)
+    plt.show()
 
-    def save_series(self, series_name, path):
-        """
-        Save a series in the specified path
-        :param series_name: name of the series
-        :param path: location to save the series
-        """
-        target = self.data[series_name]
-        pd_series = pd.Series(target)
-        pd_series.to_csv(path, header=False, index=False)
 
-    def load_series(self, series_name, path):
-        """
-        Load a series in the specified path
-        :param series_name: name of the series
-        :param path: location to load the series from
-        """
-        pd_series = pd.read_csv(path)
-        target = pd_series.to_numpy().flatten()
-        self.add_series(series_name, target)
+if __name__ == "__main__":
 
-    def plot_comparison_graph(self, title, x_label, y_label, grid=True, path=None, save=False):
-        """
-        Plot comparison among temporal series
-        :param title: title of the plot
-        :param x_label: label axis-x
-        :param y_label: label axis-y
-        :param grid: flag to enable the grid on the plot, default True
-        :param path: path to optionally save the image, used only when save is True
-        :param save: flag to save the image in path
-        """
-        keys = self.data.keys()
-        plt.grid(grid)
-        plt.title(title)
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
-        for key in keys:
-            plt.plot(self.data[key], label=key)
-        plt.legend(loc='upper right')
-        # saving the image
-        if save:
-            plt.savefig(path)
-        plt.show()
-
-    def plot_scatter(self, series_name, title, x_label, y_label, size, path=None, save=False):
-        series = self.data[series_name]
-        plt.grid(True)
-        plt.title(title)
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
-        plt.scatter(range(len(series)), series, s=size)
-        if save:
-            plt.savefig(path)
-        plt.show()
+    data = range(1,11)
+    log = np.log(data)
+    exp = np.exp(data)
+    pow = np.power(data, 2)
+    list = [log, exp, pow]
+    labels = ["log", "exp", "pow"]
+    markers = ["-b", "-y", "-r"]
+    title = "Example"
+    xtitle = "x axis"
+    ytitle = "y axis"
+    plot_graph(list,labels,markers,title,xtitle,ytitle,True,True,"example.png")

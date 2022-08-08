@@ -1,6 +1,6 @@
 from queue import Queue
 from threading import Thread
-from train_utils import mean_tensors
+from utils import mean_tensors
 import numpy as np
 import tensorflow as tf
 
