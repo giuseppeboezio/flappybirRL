@@ -10,6 +10,12 @@ from utils import BASE_SHAPE, save_series, plot_graph
 
 
 def update_series(series, obs):
+    """
+    Update the time series
+    :param series: timeseries
+    :param: current observation
+    :return updated timeseries
+    """
     new_series = series.numpy()
     new_series[:, :-1, :] = new_series[:, 1:, :]
     new_series[:, -1, :] = obs
