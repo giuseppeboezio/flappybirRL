@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import tensorflow as tf
 from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE
 
 
@@ -43,6 +44,20 @@ def preprocess_image(functions_list, image):
         output = function(output)
 
     return output
+
+
+def update_stack(stack, image):
+    """
+    Update input of the convolutional neural network
+    :param stack: stack of the last preprocessed images
+    :param image: current preprocessed image
+    :return updated stack with last image equals to the current one
+    """
+    new_series = stack.numpy()
+    new_series[:, :, :, :-1] = new_series[:, :, :, 1:]
+    new_series[:, :, :, -1] = image
+    return tf.constant(new_series)
+
 
 
 
