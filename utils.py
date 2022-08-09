@@ -6,6 +6,8 @@ import tensorflow as tf
 # constants
 # input shape base model
 BASE_SHAPE = (1, 8, 2)
+# input shape CNN model
+CNN_SHAPE = (1, 84, 84, 4)
 # shape of the preprocessed image
 IMAGE_SHAPE = (84, 84)
 # maximum value of a pixel

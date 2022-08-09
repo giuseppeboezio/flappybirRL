@@ -1,7 +1,13 @@
 import cv2
 import numpy as np
 import tensorflow as tf
-from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE
+from tensorflow.keras.optimizers import RMSprop
+import flappy_bird_gym
+from agents.actor_critic_agent import ActorCriticAgent
+from agents.networks import ActorCriticCNN
+from training.loss_estimator import A2CLossEstimator
+from training.train_a2c import train_step
+from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE, CNN_SHAPE, save_series, plot_graph
 
 
 def grayscale(image):
@@ -115,4 +121,51 @@ def episode(agent, env, max_steps):
 
 
 if __name__ == "__main__":
+    # Initialization
+    num_episodes = 3
+    num_threads = 1
+    env = flappy_bird_gym.make("FlappyBird-rgb-v0")
+    num_actions = env.action_space.n
+    agent = ActorCriticAgent(ActorCriticCNN, CNN_SHAPE, num_actions)
+    max_steps = 100000
+    gamma = 0.99
+    estimator = A2CLossEstimator()
+    optimizer = RMSprop(decay=0.99)
+    path = "saved_models/image/image"
 
+    mean_rewards = []
+    std_rewards = []
+
+    for i in range(num_episodes):
+        mean, std = train_step(
+            num_threads,
+            agent,
+            env.__class__,
+            episode,
+            max_steps,
+            gamma,
+            estimator,
+            optimizer
+        )
+
+        agent.save_weights("saved_models/image/image")
+
+        print(f"Episode {i + 1}, Mean: {mean} Std: {std}")
+
+        mean_rewards.append(mean)
+        std_rewards.append(std)
+
+    # save the results
+    save_series(mean_rewards, "data/image/image_mean.csv")
+    save_series(std_rewards, "data/image/image_std.csv")
+    plot_graph(
+        [mean_rewards, std_rewards],
+        ["Mean", "Std"],
+        ["-b", "-y"],
+        "",
+        "Training Episode",
+        "",
+        True,
+        True,
+        "plot/image.png"
+    )
