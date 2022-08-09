@@ -40,7 +40,7 @@ def episode(agent, env, max_steps):
     obs = tf.constant(env.reset())
     SERIES_LENGTH = 8
     # (1,2) because the state is (x_distance, y_distance)
-    initial_state_reshaped = tf.reshape(obs, (1, 2))
+    initial_state_reshaped = tf.reshape(obs, (1, obs.shape[0]))
     state_series = tf.repeat(initial_state_reshaped, SERIES_LENGTH, axis=0)
     state_series = tf.expand_dims(state_series, 0)
 
