@@ -28,6 +28,9 @@ def episode(agent, env, max_steps):
     :param agent: player of the game
     :param env: environment
     :param max_steps: maximum amount of steps to interact with the environment
+    :return values: state-value of each state of the trajectory
+    :return action_probs: action probability for each action performed in the episode
+    :return rewards: rewards of the episode plus the value of the last state
     """
 
     values = []

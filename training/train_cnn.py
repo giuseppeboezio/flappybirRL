@@ -59,5 +59,60 @@ def update_stack(stack, image):
     return tf.constant(new_series)
 
 
+def episode(agent, env, max_steps):
+    """
+    Run an episode of the environment
+    :param agent: player of the game
+    :param env: environment
+    :param max_steps: maximum amount of steps to interact with the environment
+    :return values: state-value of each state of the trajectory
+    :return action_probs: action probability for each action performed in the episode
+    :return rewards: rewards of the episode plus the value of the last state
+    """
 
+    values = []
+    action_probs = []
+    rewards = []
+
+    obs = tf.constant(env.reset())
+    functions = [grayscale, rescale, normalize]
+    processed_image = preprocess_image(functions, obs)
+    SERIES_LENGTH = 4
+    h = processed_image.shape[0]
+    w = processed_image.shape[1]
+    stack = np.reshape(processed_image, (h, w, 1))
+    stack = tf.repeat(stack, SERIES_LENGTH, axis=2)
+    stack = tf.expand_dims(stack, 0)
+
+    step = 1
+    done = False
+
+    while step <= max_steps and not done:
+        # agent's behaviour
+        action_probs_step, value = agent.act(stack)
+        # action choice
+        action = np.random.choice(range(agent.num_actions), p=action_probs_step.numpy().flatten())
+        # storing value and action
+        values.append(value[0,0])
+        action_probs.append(action_probs_step[0, action])
+        state, reward, done, _ = env.step(action)
+        processed_image = preprocess_image(functions, state)
+        stack = update_stack(stack, processed_image)
+        # storing reward
+        rewards.append(reward)
+
+        step += 1
+
+        # check exit condition
+        value = 0
+        if not done:
+            # the reward of the last state is estimated with the state-value function
+            action_probs_step, value = agent.act(stack)
+            value = value[0, 0]
+
+        rewards.append(value)
+        return values, action_probs, rewards
+
+
+if __name__ == "__main__":
 
