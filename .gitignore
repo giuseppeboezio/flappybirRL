@@ -129,6 +129,5 @@ dmypy.json
 .pyre/
 
 # project settings
-flappy-bird-gym/
 .idea/
 .venv/
