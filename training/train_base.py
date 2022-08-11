@@ -83,8 +83,7 @@ if __name__ == "__main__":
     max_steps = 100000
     gamma = 0.99
     estimator = A2CLossEstimator()
-    optimizer = RMSprop(decay=0.99)
-    path = "saved_models/base/base"
+    optimizer = RMSprop(learning_rate=0.01)
 
     mean_rewards = []
     std_rewards = []

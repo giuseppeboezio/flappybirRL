@@ -10,13 +10,16 @@ from training.train_a2c import train_step
 from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE, CNN_SHAPE, save_series, plot_graph
 
 
-def grayscale(image):
+def luminance(image):
     """
-    Convert a 3d image to a 2d one keeping the maximum value along each channel
+    Convert a 3d image to a 2d extracting luminance from rgb image
     :param image: 3d image
     :return 2d grayscale image
     """
-    return np.max(image, axis=2)
+    WEIGHT_R = 0.3
+    WEIGHT_G = 0.59
+    WEIGHT_B = 0.11
+    return WEIGHT_R * image[:,:,0] + WEIGHT_G * image[:,:,1] + WEIGHT_B * image[:,:,2]
 
 
 def rescale(image):
@@ -81,13 +84,13 @@ def episode(agent, env, max_steps):
     rewards = []
 
     obs = tf.constant(env.reset())
-    functions = [grayscale, rescale, normalize]
+    functions = [luminance, rescale, normalize]
     processed_image = preprocess_image(functions, obs)
     SERIES_LENGTH = 4
     h = processed_image.shape[0]
     w = processed_image.shape[1]
-    stack = np.reshape(processed_image, (h, w, 1))
-    stack = tf.repeat(stack, SERIES_LENGTH, axis=2)
+    processed_image = np.reshape(processed_image, (h, w, 1))
+    stack = tf.repeat(processed_image, SERIES_LENGTH, axis=2)
     stack = tf.expand_dims(stack, 0)
 
     step = 1
@@ -130,8 +133,7 @@ if __name__ == "__main__":
     max_steps = 100000
     gamma = 0.99
     estimator = A2CLossEstimator()
-    optimizer = RMSprop(decay=0.99)
-    path = "saved_models/image/image"
+    optimizer = RMSprop(learning_rate=0.01)
 
     mean_rewards = []
     std_rewards = []
