@@ -52,7 +52,7 @@ def preprocess_image(functions_list, image):
     for function in functions_list:
         output = function(output)
 
-    return output
+    return tf.constant(output)
 
 
 def update_stack(stack, image):
@@ -85,7 +85,7 @@ def episode(agent, env, max_steps):
 
     obs = tf.constant(env.reset())
     functions = [luminance, rescale, normalize]
-    processed_image = preprocess_image(functions, obs)
+    processed_image = preprocess_image(functions, obs.numpy())
     SERIES_LENGTH = 4
     h = processed_image.shape[0]
     w = processed_image.shape[1]
@@ -112,21 +112,21 @@ def episode(agent, env, max_steps):
 
         step += 1
 
-        # check exit condition
-        value = 0
-        if not done:
-            # the reward of the last state is estimated with the state-value function
-            action_probs_step, value = agent.act(stack)
-            value = value[0, 0]
+    # check exit condition
+    value = 0
+    if not done:
+        # the reward of the last state is estimated with the state-value function
+        action_probs_step, value = agent.act(stack)
+        value = value[0, 0]
 
-        rewards.append(value)
-        return values, action_probs, rewards
+    rewards.append(value)
+    return values, action_probs, rewards
 
 
 if __name__ == "__main__":
     # Initialization
-    num_episodes = 3
-    num_threads = 1
+    num_episodes = 500
+    num_threads = 3
     env = flappy_bird_gym.make("FlappyBird-rgb-v0")
     num_actions = env.action_space.n
     agent = ActorCriticAgent(ActorCriticCNN, CNN_SHAPE, num_actions)
