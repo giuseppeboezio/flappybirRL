@@ -1,12 +1,10 @@
 import tensorflow as tf
 from agents.networks import ActorCriticBase
 import numpy as np
-from agents.actor_critic_agent import ActorCriticAgent
 import flappy_bird_gym
 from tensorflow.keras.optimizers import RMSprop
-from train_a2c import train_step
 from loss_estimator import A2CLossEstimator
-from utils import BASE_SHAPE, save_series, plot_graph
+from utils import BASE_SHAPE
 from train import train
 
 
