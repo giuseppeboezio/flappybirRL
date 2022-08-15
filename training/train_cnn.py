@@ -3,11 +3,10 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
 import flappy_bird_gym
-from agents.actor_critic_agent import ActorCriticAgent
 from agents.networks import ActorCriticCNN
 from training.loss_estimator import A2CLossEstimator
-from training.train_a2c import train_step
-from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE, CNN_SHAPE, save_series, plot_graph
+from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE
+from train import train
 
 
 def luminance(image):
@@ -124,50 +123,26 @@ def episode(agent, env, max_steps):
 
 
 if __name__ == "__main__":
-    # Initialization
-    num_episodes = 500
+
+    num_episodes = 5000
     num_threads = 3
     env = flappy_bird_gym.make("FlappyBird-rgb-v0")
-    num_actions = env.action_space.n
-    agent = ActorCriticAgent(ActorCriticCNN, CNN_SHAPE, num_actions)
+    input_shape = (1, IMAGE_SHAPE[0], IMAGE_SHAPE[1], 4)
     max_steps = 100000
-    gamma = 0.99
+    gamma = 0.90
     estimator = A2CLossEstimator()
     optimizer = RMSprop(learning_rate=0.01)
 
-    mean_rewards = []
-    std_rewards = []
-
-    for i in range(num_episodes):
-        mean, std = train_step(
-            num_threads,
-            agent,
-            env.__class__,
-            episode,
-            max_steps,
-            gamma,
-            estimator,
-            optimizer
-        )
-
-        agent.save_weights("saved_models/image/image")
-
-        print(f"Episode {i + 1}, Mean: {mean} Std: {std}")
-
-        mean_rewards.append(mean)
-        std_rewards.append(std)
-
-    # save the results
-    save_series(mean_rewards, "data/image/image_mean.csv")
-    save_series(std_rewards, "data/image/image_std.csv")
-    plot_graph(
-        [mean_rewards, std_rewards],
-        ["Mean", "Std"],
-        ["-b", "-y"],
-        "",
-        "Training Episode",
-        "",
-        True,
-        True,
-        "plot/image.png"
+    train(
+        num_episodes,
+        num_threads,
+        env,
+        ActorCriticCNN,
+        input_shape,
+        max_steps,
+        gamma,
+        estimator,
+        episode,
+        optimizer,
+        "cnn_model"
     )

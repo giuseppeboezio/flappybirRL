@@ -7,6 +7,7 @@ from tensorflow.keras.optimizers import RMSprop
 from train_a2c import train_step
 from loss_estimator import A2CLossEstimator
 from utils import BASE_SHAPE, save_series, plot_graph
+from train import train
 
 
 def update_series(series, obs):
@@ -74,51 +75,24 @@ def episode(agent, env, max_steps):
 
 if __name__ == "__main__":
 
-    # Initialization
-    num_episodes = 3
-    num_threads = 1
+    num_episodes = 5000
+    num_threads = 3
     env = flappy_bird_gym.make("FlappyBird-v0")
-    num_actions = env.action_space.n
-    agent = ActorCriticAgent(ActorCriticBase, BASE_SHAPE, num_actions)
     max_steps = 100000
-    gamma = 0.99
+    gamma = 0.90
     estimator = A2CLossEstimator()
     optimizer = RMSprop(learning_rate=0.01)
 
-    mean_rewards = []
-    std_rewards = []
-
-    for i in range(num_episodes):
-
-        mean, std = train_step(
-            num_threads,
-            agent,
-            env.__class__,
-            episode,
-            max_steps,
-            gamma,
-            estimator,
-            optimizer
-        )
-
-        agent.save_weights("saved_models/base/base")
-
-        print(f"Episode {i+1}, Mean: {mean} Std: {std}")
-
-        mean_rewards.append(mean)
-        std_rewards.append(std)
-
-    # save the results
-    save_series(mean_rewards, "data/base/base_mean.csv")
-    save_series(std_rewards, "data/base/base_std.csv")
-    plot_graph(
-        [mean_rewards, std_rewards],
-        ["Mean", "Std"],
-        ["-b","-y"],
-        "",
-        "Training Episode",
-        "",
-        True,
-        True,
-        "plot/base.png"
+    train(
+        num_episodes,
+        num_threads,
+        env,
+        ActorCriticBase,
+        BASE_SHAPE,
+        max_steps,
+        gamma,
+        estimator,
+        episode,
+        optimizer,
+        "base_model"
     )
