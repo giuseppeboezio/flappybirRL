@@ -6,7 +6,7 @@ import flappy_bird_gym
 from agents.networks import ActorCriticCNN
 from training.loss_estimator import A2CLossEstimator
 from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE
-from train import train
+from .train_utils import train
 
 
 def luminance(image):

@@ -3,9 +3,9 @@ from agents.networks import ActorCriticBase
 import numpy as np
 import flappy_bird_gym
 from tensorflow.keras.optimizers import RMSprop
-from loss_estimator import A2CLossEstimator
+from .loss_estimator import A2CLossEstimator
 from utils import BASE_SHAPE
-from train import train
+from train_utils import train
 
 
 def update_series(series, obs):
