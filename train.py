@@ -130,5 +130,5 @@ if __name__ == "__main__":
             A2CEntropyLossEstimator(),
             train_base.episode,
             RMSprop(learning_rate=args.learning_rate),
-            "base_model"
+            "entropy_model"
         )

@@ -51,4 +51,4 @@ def evaluate_agent(model_name, num_games):
 
 if __name__ == "__main__":
 
-    evaluate_agent("cnn_model", num_games=10)
+    evaluate_agent("trained_cnn", num_games=10)
