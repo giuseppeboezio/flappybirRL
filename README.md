@@ -16,6 +16,7 @@ The repository is composed as follows:
 - *agents*: agents and networks
 - *assets*: resources for the README.md
 - *envs*: customized version of the original environment
+- *evaluation*: functions to evaluate pretrained models and compare them using a boxplot
 - *training*: A2C algorithm, data, plots and utility related to training
 - *report.pdf*: final report of the project
 - *utils.py*: constants and functions to plot graphs
