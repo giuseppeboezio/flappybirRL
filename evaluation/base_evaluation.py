@@ -7,6 +7,7 @@ from utils import BASE_SHAPE, save_series
 import numpy as np
 import time
 
+
 def evaluate_agent(model_name, num_games, human_mode=False):
     """
     Evaluate the performance of an agent for a certain number of games
@@ -44,7 +45,7 @@ def evaluate_agent(model_name, num_games, human_mode=False):
             state_series = update_series(state_series, state)
 
         # storing score
-        scores.append(int(info["score"]))
+        scores.append(info["score"])
 
     save_series(scores, f"data/{model_name}.csv")
 

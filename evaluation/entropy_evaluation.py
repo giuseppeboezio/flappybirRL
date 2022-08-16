@@ -1,4 +1,4 @@
-from base_evaluation import evaluate_agent
+from .base_evaluation import evaluate_agent
 
 if __name__ == "__main__":
 

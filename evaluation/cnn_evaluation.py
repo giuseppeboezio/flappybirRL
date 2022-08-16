@@ -8,7 +8,7 @@ import numpy as np
 import time
 
 
-def evaluate_agent(model_name, num_games, human_mode=False):
+def evaluate_agent(model_name, num_games, human_mode=True):
     """
     Evaluate the performance of an agent for a certain number of games
     :param model_name: name of the pretrained model
@@ -51,7 +51,7 @@ def evaluate_agent(model_name, num_games, human_mode=False):
             stack = update_stack(stack, processed_image)
 
         # storing score
-        scores.append(int(info["score"]))
+        scores.append(info["score"])
 
     save_series(scores, f"data/{model_name}.csv")
 
