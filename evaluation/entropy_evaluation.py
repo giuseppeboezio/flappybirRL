@@ -1,5 +1,6 @@
-from .base_evaluation import evaluate_agent
+from evaluation.base_evaluation import evaluate_agent
+from utils import ENTROPY
 
 if __name__ == "__main__":
 
-    evaluate_agent("trained_entropy", num_games=10)
+    evaluate_agent(ENTROPY, num_games=10)

@@ -1,11 +1,12 @@
 import tensorflow as tf
 import flappy_bird_gym
+import numpy as np
+import time
+
 from agents.actor_critic_agent import ActorCriticAgent
 from agents.networks import ActorCriticCNN
 from training.train_cnn import luminance, rescale, normalize, update_stack, preprocess_image
-from utils import IMAGE_SHAPE, save_series
-import numpy as np
-import time
+from utils import IMAGE_SHAPE, FLAPPY_IMAGE_NAME, NUM_CHANNELS, CNN, save_series
 
 
 def evaluate_agent(model_name, num_games, human_mode=True):
@@ -17,7 +18,7 @@ def evaluate_agent(model_name, num_games, human_mode=True):
     :return save scores of num_games
     """
     scores = []
-    env = flappy_bird_gym.make("FlappyBird-rgb-v0")
+    env = flappy_bird_gym.make(FLAPPY_IMAGE_NAME)
     input_shape = (1, IMAGE_SHAPE[0], IMAGE_SHAPE[1], 4)
     agent = ActorCriticAgent(ActorCriticCNN, input_shape, env.action_space.n)
     agent.load_weights(f"../training/saved_models/{model_name}/{model_name}")
@@ -27,11 +28,10 @@ def evaluate_agent(model_name, num_games, human_mode=True):
         obs = tf.constant(env.reset())
         functions = [luminance, rescale, normalize]
         processed_image = preprocess_image(functions, obs.numpy())
-        SERIES_LENGTH = 4
         h = processed_image.shape[0]
         w = processed_image.shape[1]
         processed_image = np.reshape(processed_image, (h, w, 1))
-        stack = tf.repeat(processed_image, SERIES_LENGTH, axis=2)
+        stack = tf.repeat(processed_image, NUM_CHANNELS, axis=2)
         stack = tf.expand_dims(stack, 0)
 
         done = False
@@ -50,7 +50,6 @@ def evaluate_agent(model_name, num_games, human_mode=True):
             processed_image = preprocess_image(functions, state)
             stack = update_stack(stack, processed_image)
 
-        # storing score
         scores.append(info["score"])
 
     save_series(scores, f"data/{model_name}.csv")
@@ -58,4 +57,4 @@ def evaluate_agent(model_name, num_games, human_mode=True):
 
 if __name__ == "__main__":
 
-    evaluate_agent("trained_cnn", num_games=10)
+    evaluate_agent(CNN, num_games=10)
