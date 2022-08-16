@@ -4,11 +4,17 @@ This repository contains the code and the report for the project of the exam [Au
 
 In this project the A2C reinforcement learning method is used to learn to play [Flappy Bird](https://en.wikipedia.org/wiki/Flappy_Bird) mobile game.
 
+## Game
+
+This is a part of a game using the base agent which has been trained using the A2C method with the standard loss.
+
+[game](game.gif)
+
 ## Structure
 
 The repository is composed as follows:
 - *agents*: agents and networks
-- *assets*: resources for the readme.md
+- *assets*: resources for the README.md
 - *envs*: customized version of the original environment
 - *training*: A2C algorithm, data, plots and utility related to training
 - *report.pdf*: final report of the project
@@ -60,13 +66,3 @@ To play a game with a specific agent the script **play.py** in the **evaluation*
 py play.py <agent>
 ```
 where *agent* is the name of a pretrained agent
-
-## Game example
-
-This is a part of a game using the base agent which has been trained using the A2C method with the standard loss.
-
-[game](game.gif)
-
-
-
-
