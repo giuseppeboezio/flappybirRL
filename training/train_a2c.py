@@ -1,13 +1,15 @@
-from queue import Queue
-from threading import Thread
-from utils import mean_tensors
 import numpy as np
 import tensorflow as tf
+
+from queue import Queue
+from threading import Thread
+
+from utils import mean_tensors
 
 
 def get_expected_returns(rewards, gamma):
     """
-    Returns expected returns of an episode
+    Expected returns of an episode
     :param rewards: rewards of an episode plus the value of the last state
     :param gamma: discount rate to compute expected returns
     :return expected returns
@@ -62,7 +64,7 @@ def train_step(num_threads, agent, env_class, run_episode, max_steps, gamma, los
     Train the agent for one episode averaging the gradients of each thread
     :param num_threads: number of different environment interaction in an episode
     :param agent: player of the game
-    :param env_class: openAI Gym environment class
+    :param env_class: OpenAI Gym environment class
     :param run_episode: function to run a single thread episode,
     its parameters are the agent, the environment and the maximum number of steps per episode
     :param max_steps: upper limit of interactions with the environment in a single episode

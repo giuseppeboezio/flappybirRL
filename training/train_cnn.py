@@ -1,12 +1,13 @@
-import cv2
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
+import cv2
 import flappy_bird_gym
+
 from agents.networks import ActorCriticCNN
 from training.loss_estimator import A2CLossEstimator
-from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE
-from .train_utils import train
+from utils import IMAGE_SHAPE, MAX_PIXEL_VALUE, NUM_CHANNELS, FLAPPY_IMAGE_NAME
+from training.train_utils import train
 
 
 def luminance(image):
@@ -85,11 +86,10 @@ def episode(agent, env, max_steps):
     obs = tf.constant(env.reset())
     functions = [luminance, rescale, normalize]
     processed_image = preprocess_image(functions, obs.numpy())
-    SERIES_LENGTH = 4
     h = processed_image.shape[0]
     w = processed_image.shape[1]
     processed_image = np.reshape(processed_image, (h, w, 1))
-    stack = tf.repeat(processed_image, SERIES_LENGTH, axis=2)
+    stack = tf.repeat(processed_image, NUM_CHANNELS, axis=2)
     stack = tf.expand_dims(stack, 0)
 
     step = 1
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
     num_episodes = 5000
     num_threads = 3
-    env = flappy_bird_gym.make("FlappyBird-rgb-v0")
+    env = flappy_bird_gym.make(FLAPPY_IMAGE_NAME)
     input_shape = (1, IMAGE_SHAPE[0], IMAGE_SHAPE[1], 4)
     max_steps = 100000
     gamma = 0.90
@@ -144,5 +144,5 @@ if __name__ == "__main__":
         estimator,
         episode,
         optimizer,
-        "cnn_model"
+        model_name="cnn_model"
     )

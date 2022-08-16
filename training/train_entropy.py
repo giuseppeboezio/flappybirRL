@@ -1,16 +1,17 @@
-import flappy_bird_gym
-from loss_estimator import A2CEntropyLossEstimator
 from tensorflow.keras.optimizers import RMSprop
+import flappy_bird_gym
+
 from agents.networks import ActorCriticBase
-from utils import BASE_SHAPE
+from loss_estimator import A2CEntropyLossEstimator
+from utils import BASE_SHAPE, FLAPPY_BASE_NAME
 from train_base import episode
 from train_utils import train
 
 
 if __name__ == "__main__":
-    num_episodes = 5000
+    num_episodes = 3000
     num_threads = 3
-    env = flappy_bird_gym.make("FlappyBird-v0")
+    env = flappy_bird_gym.make(FLAPPY_BASE_NAME)
     max_steps = 100000
     gamma = 0.90
     estimator = A2CEntropyLossEstimator()
@@ -27,5 +28,5 @@ if __name__ == "__main__":
         estimator,
         episode,
         optimizer,
-        "base_model"
+        model_name="base_model"
     )

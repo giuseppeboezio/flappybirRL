@@ -66,7 +66,7 @@ def train(
         "",
         "Training Episode",
         "",
-        True,
-        True,
-        f"plot/{model_name}.png"
+        grid=True,
+        save=True,
+        path=f"plot/{model_name}.png"
     )

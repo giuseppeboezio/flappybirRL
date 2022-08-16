@@ -1,7 +1,8 @@
 import numpy as np
-from matplotlib import pyplot as plt
-import pandas as pd
 import tensorflow as tf
+import pandas as pd
+from matplotlib import pyplot as plt
+
 
 # constants
 # name of the environments
@@ -45,6 +46,7 @@ def log2(x):
     :param x: argument of the logarithm
     :return log in base 2 of x
     """
+    # change of basis formula
     numerator = tf.math.log(x)
     denominator = tf.math.log(tf.constant(2, dtype=numerator.dtype))
     return numerator / denominator
@@ -112,12 +114,3 @@ def compare_boxplot(dictionary, save=False, path=None):
         assert path is not None
         plt.savefig(path)
     plt.show()
-
-
-if __name__ == "__main__":
-
-    data = {}
-    data["A"] = np.array([1,1,2,3,4,5])
-    data["B"] = np.array([4,6,7,8,9,9,5,6])
-
-    compare_boxplot(data)

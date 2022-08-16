@@ -1,11 +1,12 @@
-import tensorflow as tf
-from agents.networks import ActorCriticBase
 import numpy as np
-import flappy_bird_gym
+import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
-from .loss_estimator import A2CLossEstimator
-from utils import BASE_SHAPE
-from train_utils import train
+import flappy_bird_gym
+
+from agents.networks import ActorCriticBase
+from training.loss_estimator import A2CLossEstimator
+from utils import BASE_SHAPE, SERIES_LENGTH, FLAPPY_BASE_NAME
+from training.train_utils import train
 
 
 def update_series(series, obs):
@@ -37,9 +38,10 @@ def episode(agent, env, max_steps):
     rewards = []
 
     obs = tf.constant(env.reset())
-    SERIES_LENGTH = 8
     initial_state_reshaped = tf.reshape(obs, (1, obs.shape[0]))
+    # the input of the network must be a sequence
     state_series = tf.repeat(initial_state_reshaped, SERIES_LENGTH, axis=0)
+    # batch size is 1
     state_series = tf.expand_dims(state_series, 0)
 
     step = 1
@@ -75,7 +77,7 @@ if __name__ == "__main__":
 
     num_episodes = 5000
     num_threads = 3
-    env = flappy_bird_gym.make("FlappyBird-v0")
+    env = flappy_bird_gym.make(FLAPPY_BASE_NAME)
     max_steps = 100000
     gamma = 0.90
     estimator = A2CLossEstimator()
@@ -92,5 +94,5 @@ if __name__ == "__main__":
         estimator,
         episode,
         optimizer,
-        "base_model"
+        model_name="base_model"
     )
