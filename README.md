@@ -1,4 +1,4 @@
-# FlappyBirdRL [icon](assets/icon.png)
+# FlappyBirdRL <img src="assets/icon.png" title="icon" alt="icon" width="50" height="40"/>&nbsp;
 
 This repository contains the code and the report for the project of the exam [Autonomous and Adaptive Systems](https://www.unibo.it/it/didattica/insegnamenti/insegnamento/2021/477337) of the [Master's degree in Artificial Intelligence, University of Bologna](https://corsi.unibo.it/2cycle/artificial-intelligence).
 
