@@ -4,12 +4,23 @@ import pandas as pd
 import tensorflow as tf
 
 # constants
+# name of the environments
+FLAPPY_BASE_NAME = "FlappyBird-v0"
+FLAPPY_IMAGE_NAME = "FlappyBird-rgb-v0"
 # input shape base model
 BASE_SHAPE = (1, 8, 3)
 # shape of the preprocessed image
 IMAGE_SHAPE = (84, 84)
 # maximum value of a pixel
 MAX_PIXEL_VALUE = 255
+# length of the timeseries of the base model
+SERIES_LENGTH = 8
+# number of channels for the stack of the cnn model
+NUM_CHANNELS = 4
+# name of the default pretrained model
+BASE = "trained_base"
+CNN = "trained_cnn"
+ENTROPY = "trained_entropy"
 
 
 def mean_tensors(tensors):
@@ -87,16 +98,26 @@ def plot_graph(series_list, series_labels, markers, title, x_label, y_label, gri
     plt.show()
 
 
+def compare_boxplot(dictionary, save=False, path=None):
+    """
+    Compare boxplots of different samples
+    :param dictionary: dictionary having the xtick labels as keys and data as values
+    :param save: flag to save the plot
+    :param path: location where to save the image
+    """
+    fig, ax = plt.subplots()
+    ax.boxplot(dictionary.values())
+    ax.set_xticklabels(dictionary.keys())
+    if save:
+        assert path is not None
+        plt.savefig(path)
+    plt.show()
+
+
 if __name__ == "__main__":
 
-    data = range(1,11)
-    log = np.log(data)
-    exp = np.exp(data)
-    pow = np.power(data, 2)
-    list = [log, exp, pow]
-    labels = ["log", "exp", "pow"]
-    markers = ["-b", "-y", "-r"]
-    title = "Example"
-    xtitle = "x axis"
-    ytitle = "y axis"
-    plot_graph(list,labels,markers,title,xtitle,ytitle,True,True,"example.png")
+    data = {}
+    data["A"] = np.array([1,1,2,3,4,5])
+    data["B"] = np.array([4,6,7,8,9,9,5,6])
+
+    compare_boxplot(data)
