@@ -6,9 +6,9 @@ In this project the A2C reinforcement learning method is used to learn to play [
 
 ## Game
 
-This is a part of a game using the base agent which has been trained using the A2C method with the standard loss.
+This is part of a game played by an agent trained using A2C algorithm
 
-[game](game.gif)
+ ![game gif](assets/game.gif)
 
 ## Structure
 
