@@ -68,7 +68,7 @@ def load_series(path):
     :param path: location where the series is stored
     :return numpy series
     """
-    pd_series = pd.read_csv(path, header=False)
+    pd_series = pd.read_csv(path, header=None)
     series = pd_series.to_numpy().flatten()
     return series
 
