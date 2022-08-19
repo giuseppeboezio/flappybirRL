@@ -9,7 +9,7 @@ from training.train_base import update_series
 from utils import BASE_SHAPE, FLAPPY_BASE_NAME, SERIES_LENGTH, BASE, save_series
 
 
-def evaluate_agent(model_name, num_games, human_mode=False):
+def evaluate_agent(model_name, num_games, human_mode=True):
     """
     Evaluate the performance of an agent for a certain number of games
     :param model_name: name of the pretrained model

@@ -9,7 +9,7 @@ from training.train_cnn import luminance, rescale, normalize, update_stack, prep
 from utils import IMAGE_SHAPE, FLAPPY_IMAGE_NAME, NUM_CHANNELS, CNN, save_series
 
 
-def evaluate_agent(model_name, num_games, human_mode=True):
+def evaluate_agent(model_name, num_games, human_mode=False):
     """
     Evaluate the performance of an agent for a certain number of games
     :param model_name: name of the pretrained model
