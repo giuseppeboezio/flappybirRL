@@ -7,5 +7,5 @@ if __name__ == "__main__":
     cnn = load_series(f"{directory}/{CNN}.csv")
     entropy = load_series(f"{directory}/{ENTROPY}.csv")
 
-    dictionary = {"base": base, "cnn": cnn, "entropy": entropy}
+    dictionary = {"base": base, "entropy": entropy, "cnn": cnn}
     compare_boxplot(dictionary, save=True, path="boxplot.png")
