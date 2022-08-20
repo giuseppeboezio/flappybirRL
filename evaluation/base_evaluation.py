@@ -20,7 +20,7 @@ def evaluate_agent(model_name, num_games, human_mode=True):
     scores = []
     env = flappy_bird_gym.make(FLAPPY_BASE_NAME)
     agent = ActorCriticAgent(ActorCriticBase, BASE_SHAPE, env.action_space.n)
-    agent.load_weights(f"../training/saved_models/{model_name}/{model_name}")
+    agent.load_weights(f"training/saved_models/{model_name}/{model_name}")
 
     for _ in range(num_games):
 
