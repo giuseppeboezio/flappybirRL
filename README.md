@@ -35,7 +35,7 @@ The environment has been partially developed reusing the implementation provided
 ```console
 git clone https://github.com/Talendar/flappy-bird-gym.git
 ```
-2. Copy the folder **envs** of the current repository to __flappy-bird-gym\flappy_bird_gym__ replacing the folder with the same name. This operation allows to replace the original implementation of the environment with the new customized one.
+2. Copy the folder **envs** of the current repository to __flappy-bird-gym/flappy_bird_gym__ replacing the folder with the same name. This operation allows to replace the original implementation of the environment with the new customized one.
 3. Install the library **flappy-bird-gym** directly from a local folder.
 ```console
 pip install -e flappy-bird-gym
