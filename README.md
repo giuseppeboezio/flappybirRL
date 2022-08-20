@@ -19,6 +19,8 @@ The repository is composed as follows:
 - *evaluation*: functions to evaluate pretrained models and compare them using a boxplot
 - *training*: A2C algorithm, data, plots and utility related to training
 - *report.pdf*: final report of the project
+- *play.py*: run a game with an agent
+- *train.py*: train an agent
 - *utils.py*: constants and functions to plot graphs
 
 ## Requirements
@@ -50,7 +52,7 @@ Because of **flappy-bird-gym** requirements and **tensorflow** compatibility it 
 - tensorflow version=2.8
 
 ## Run
-To train a specific version of an agent it is possible to use the script **train.py** of the **training** directory.
+To train a specific version of an agent it is possible to use the script **train.py**.
 Run:
 ```console
 py train.py <agent> <num_episodes> <num_processes> <discount_rate> <learning_rate>
@@ -62,7 +64,7 @@ where:
 - *discount_rate* is the value used to obtain expected return
 - *learning_rate* is the rate used by the optimizer to minimize the loss function
 
-To play a game with a specific agent the script **play.py** in the **evaluation** folder can be used as follows:
+To play a game with a specific agent the script **play.py** can be used as follows:
 ```console
 py play.py <agent>
 ```
