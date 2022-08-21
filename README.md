@@ -4,6 +4,8 @@ This repository contains the code and the report for the project of the exam [Au
 
 In this project the A2C reinforcement learning method is used to learn to play [Flappy Bird](https://en.wikipedia.org/wiki/Flappy_Bird) mobile game.
 
+More details can be found in the [report](report.pdf).
+
 ## Game
 
 This is part of a game played by an agent trained using A2C algorithm
@@ -18,8 +20,8 @@ The repository is composed as follows:
 - *envs*: customized version of the original environment
 - *evaluation*: functions to evaluate pretrained models and compare them using a boxplot
 - *training*: A2C algorithm, data, plots and utility related to training
-- *report.pdf*: final report of the project
 - *play.py*: run a game with an agent
+- *report.pdf*: final report of the project
 - *train.py*: train an agent
 - *utils.py*: constants and functions to plot graphs
 
