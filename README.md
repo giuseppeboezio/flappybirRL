@@ -20,10 +20,12 @@ The repository is composed as follows:
 - *envs*: customized version of the original environment
 - *evaluation*: functions to evaluate pretrained models and compare them using a boxplot
 - *training*: A2C algorithm, data, plots and utility related to training
+- *constants.py*: constants of the project
 - *play.py*: run a game with an agent
+- *plot_utils.py*: functions to generate plots
 - *report.pdf*: final report of the project
 - *train.py*: train an agent
-- *utils.py*: constants and functions to plot graphs
+- *utils.py*: utility functions
 
 ## Requirements
 
