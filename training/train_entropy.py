@@ -3,13 +3,13 @@ import flappy_bird_gym
 
 from agents.networks import ActorCriticBase
 from loss_estimator import A2CEntropyLossEstimator
-from utils import BASE_SHAPE, FLAPPY_BASE_NAME
+from constants import BASE_SHAPE, FLAPPY_BASE_NAME
 from train_base import episode
 from train_utils import train
 
 
 if __name__ == "__main__":
-    num_episodes = 3000
+    num_episodes = 2000
     num_threads = 3
     env = flappy_bird_gym.make(FLAPPY_BASE_NAME)
     max_steps = 100000

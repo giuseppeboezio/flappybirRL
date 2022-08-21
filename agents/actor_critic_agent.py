@@ -7,7 +7,8 @@ class ActorCriticAgent(BaseAgent):
         """
         Creation of the agent
         :param network_class: neural network class used by the agent
-        :param num_actions: number of actions to interact with the environment
+        :param input_shape: input shape of the neural network
+        :param num_actions: number of possible actions to interact with the environment
         """
         super().__init__()
         self.net_class = network_class
@@ -18,16 +19,16 @@ class ActorCriticAgent(BaseAgent):
 
     def act(self, observation):
         """
-        Corresponds to the probability distribution of actions given an observation and the value of the state
+        Return the probability distribution of actions given an observation and the value of the state
         :param observation: observable part of the environment
-        :return: actions probability distribution
+        :return actions probability distribution and value of the observation
         """
         return self.network(observation)
 
     def save_weights(self, path):
         """
         Save the weights of the model
-        :param path: path to store the weights
+        :param path: path where to store the weights
         """
         self.network.save_weights(path)
 
@@ -41,7 +42,7 @@ class ActorCriticAgent(BaseAgent):
     def copy(self):
         """
         Copy of the agent
-        :return: copy of the agent with the same weights of the current one
+        :return copy of the agent with the same weights of the current one
         """
         new_agent = ActorCriticAgent(self.net_class, self.input_shape, self.num_actions)
         new_agent.network.set_weights(self.network.get_weights())

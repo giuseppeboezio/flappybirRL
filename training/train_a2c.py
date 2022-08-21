@@ -40,7 +40,7 @@ def train_agent(agent, env, run_episode, max_steps, gamma, loss_estimator, queue
     :param run_episode: function to run a single episode,
     its parameters are the agent, the environment and the maximum number of steps per episode
     :param max_steps: upper limit of interactions with the environment in a single episode
-    :param gamma: discount rate to compute expected returns
+    :param gamma: discount rate to compute expected return
     :param loss_estimator: estimator of the loss function
     :param queue_gradients: queue to store gradients of different threads
     :param queue_history: queue to store cumulative rewards of different threads
@@ -62,13 +62,13 @@ def train_agent(agent, env, run_episode, max_steps, gamma, loss_estimator, queue
 def train_step(num_threads, agent, env_class, run_episode, max_steps, gamma, loss_estimator, optimizer):
     """
     Train the agent for one episode averaging the gradients of each thread
-    :param num_threads: number of different environment interaction in an episode
+    :param num_threads: number of different environment interactions in an episode
     :param agent: player of the game
     :param env_class: OpenAI Gym environment class
     :param run_episode: function to run a single thread episode,
     its parameters are the agent, the environment and the maximum number of steps per episode
     :param max_steps: upper limit of interactions with the environment in a single episode
-    :param gamma: discount rate to compute expected returns
+    :param gamma: discount rate to compute expected return
     :param loss_estimator: estimator of the loss function
     :param optimizer: optimizer to update network's weights
     :return mean of cumulative rewards

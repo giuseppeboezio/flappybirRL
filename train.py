@@ -1,9 +1,10 @@
 from tensorflow.keras.optimizers import RMSprop
 import flappy_bird_gym
+
 import argparse
 
 from agents.networks import *
-from utils import BASE_SHAPE, IMAGE_SHAPE, FLAPPY_BASE_NAME, FLAPPY_IMAGE_NAME
+from constants import BASE_SHAPE, IMAGE_SHAPE, FLAPPY_BASE_NAME, FLAPPY_IMAGE_NAME
 from training.loss_estimator import A2CLossEstimator, A2CEntropyLossEstimator
 from training import train_base, train_cnn
 from training.train_utils import train

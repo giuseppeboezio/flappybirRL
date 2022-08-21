@@ -2,7 +2,7 @@ import argparse
 
 from evaluation.base_evaluation import evaluate_agent as evaluate_base
 from evaluation.cnn_evaluation import evaluate_agent as evaluate_cnn
-from utils import BASE, CNN, ENTROPY
+from constants import BASE, CNN, ENTROPY
 
 if __name__ == "__main__":
 

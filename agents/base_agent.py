@@ -7,6 +7,6 @@ class BaseAgent:
         """
         Perform an action given an observation of the environment
         :param observation: environment observation
-        :return: action to perform
+        :return action to perform
         """
         pass

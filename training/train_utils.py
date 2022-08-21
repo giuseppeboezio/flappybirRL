@@ -1,6 +1,10 @@
+import os
+
 from agents.actor_critic_agent import ActorCriticAgent
 from training.train_a2c import train_step
-from utils import save_series, plot_graph
+from utils import save_series
+from constants import DIR_MODELS, DIR_DATA, DIR_PLOT
+from plot_utils import plot_graph
 
 
 def train(
@@ -19,8 +23,8 @@ def train(
     """
     Train an agent
     :param num_episodes: number of episodes
-    :param num_threads: different parallel executions
-    :param env: environment
+    :param num_threads: number of different parallel executions
+    :param env: OpenAI Gym environment
     :param network_class: class of the neural network
     :param input_shape: input shape of the neural network
     :param max_steps: maximum number of steps per episode
@@ -49,7 +53,7 @@ def train(
             optimizer
         )
 
-        agent.save_weights(f"saved_models/{model_name}/{model_name}")
+        agent.save_weights(f"{DIR_MODELS}/{model_name}/{model_name}")
 
         print(f"Episode {i + 1}, Mean: {mean} Std: {std}")
 
@@ -57,8 +61,12 @@ def train(
         std_rewards.append(std)
 
     # save the results
-    save_series(mean_rewards, f"data/{model_name}/{model_name}_mean.csv")
-    save_series(std_rewards, f"data/{model_name}/{model_name}_std.csv")
+    # check whether the folder already exists
+    if not os.path.isdir(f"{DIR_DATA}/{model_name}"):
+        os.mkdir(f"{DIR_DATA}/{model_name}")
+    # save data
+    save_series(mean_rewards, f"{DIR_DATA}/{model_name}/{model_name}_mean.csv")
+    save_series(std_rewards, f"{DIR_DATA}/{model_name}/{model_name}_std.csv")
     plot_graph(
         [mean_rewards, std_rewards],
         ["Mean", "Std"],
@@ -68,5 +76,5 @@ def train(
         "",
         grid=True,
         save=True,
-        path=f"plot/{model_name}.png"
+        path=f"{DIR_PLOT}/{model_name}.png"
     )
